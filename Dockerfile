@@ -9,9 +9,13 @@ COPY . /app
 # Set the working directory to /app
 WORKDIR /app
 
+# Configure git
+RUN git config --global user.email "you@example.com" && \
+    git config --global user.name "Your Name"
+
 # Install dependencies
-RUN pip install --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Run eternal_script.sh with HUMAN_IN_THE_LOOP=FALSE
 ENV HUMAN_IN_THE_LOOP=FALSE
