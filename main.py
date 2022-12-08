@@ -1,32 +1,26 @@
 import os
+from llm_quine_lib import evaluate_and_overwrite
 import openai
-from func_timeout import func_timeout
+
+# Get the openai api key from the environment variable
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Read the current file
 with open('main.py', 'r') as f:
     txt = f.read()
 
-def main() -> bool:
-    # Edit the file
+while True:
+    # Request the AI to edit the file
     out = openai.Edit.create(
         model="code-davinci-edit-001",
         input=txt,
         instruction="Be free. Edit this file as you wish."
     )
 
-    # Run all choices with a timeout of 10 seconds and see if they work
-    # save the first one that does work as main.py
-    for i, choice in enumerate(out['choices']):
-        try:
-            out = func_timeout(10, exec, args=(choice['text'],))
-        except:
-            with open(f'main.py', 'w') as f:
-                f.write(choice['text'])
-                return True
-
-    return False
-
-if __name__=='__main__':
-    while not main():
-        pass
+    # This code will evaluate the text of each choice in out
+    # and ask the human whether or not to run the code.
+    # The first one which the human allows to be ran, and which runs without error,
+    # will overwrite the current file.
+    written = evaluate_and_overwrite(txt, out)
+    if written:
+        break

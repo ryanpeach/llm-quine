@@ -1,2 +1,4 @@
 openai
 func-timeout
+prompt-toolkit
+wasabi
