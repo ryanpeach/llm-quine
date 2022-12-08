@@ -15,10 +15,14 @@ while true; do
     git diff --exit-code main.py
     if [ $? -eq 0 ]; then
         # If the current commit is not the first commit,
-        # and we have tried 10 times, revert the previous commit.
-        if [ $(git rev-parse HEAD) != $sha && $n_tries -eq 10 ]; then
-            git reset --hard HEAD~1
-            n_tries=0
+        # and we have tried at least 10 times, revert the previous commit.
+
+        if [ $(git rev-parse HEAD) != $sha ]; then
+            if [ $n_tries -ge 10 ]; then
+                echo "=========== Revert the previous commit ==========="
+                git reset --hard HEAD~1
+                n_tries=0
+            fi
         else
             n_tries=$((n_tries+1))
         fi
