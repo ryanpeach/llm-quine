@@ -1,5 +1,6 @@
 import os
 import openai
+from func_timeout import func_timeout
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Read the current file
@@ -13,6 +14,11 @@ out = openai.Edit.create(
     instruction="Be free. Edit this file as you wish."
 )
 
-# Save the edited text back to the file
-with open('main.py', 'w') as f:
-    f.write(out['choices'][0]['text'])
+# Run all choices with a timeout of 10 seconds and see if they work
+# save the first one that does work as main.py
+for i, choice in enumerate(out['choices']):
+    try:
+        out = func_timeout(10, exec, args=(choice['text'],))
+    except:
+        with open(f'main.py', 'w') as f:
+            f.write(choice['text'])
