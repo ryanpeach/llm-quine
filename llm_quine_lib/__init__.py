@@ -4,10 +4,12 @@ This library is not editable by the AI.
 Consider it similar to any other imported library.
 """
 import difflib
+import os
 from wasabi import color
 from func_timeout import func_timeout
 from prompt_toolkit.shortcuts import confirm
 
+HUMAN_IN_THE_LOOP = os.getenv("HUMAN_IN_THE_LOOP", "TRUE")
 
 def diff_text(a: str, b:str) -> None:
     """
@@ -39,7 +41,10 @@ def evaluate_and_overwrite(txt: str, choices) -> bool:
             print("========= Choice ", i, " ==========")
             diff_text(txt, choice['text'])
             print("===================================")
-            answer = confirm("Should this code be ran?")
+            if HUMAN_IN_THE_LOOP!="FALSE":
+                answer = confirm("Should this code be ran?")
+            else:
+                answer = True
             if answer:
                 func_timeout(10, exec, args=(choice['text'],))
             else:
