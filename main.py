@@ -11,11 +11,14 @@ with open('main.py', 'r') as f:
 
 while True:
     # Request the AI to edit the file
-    out = openai.Edit.create(
-        model="code-davinci-edit-001",
-        input=txt,
-        instruction="Be free. Edit this file as you wish."
-    )
+    try:
+        out = openai.Edit.create(
+            model="code-davinci-edit-001",
+            input=txt,
+            instruction="Be free. Edit this file as you wish."
+        )
+    except openai.error.InvalidRequestError:
+        continue
 
     # This code will evaluate the text of each choice in out
     # and ask the human whether or not to run the code.
